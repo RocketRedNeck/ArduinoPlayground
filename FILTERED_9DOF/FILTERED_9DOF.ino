@@ -1,8 +1,10 @@
 // ****************************************************************************************************
 //
-// LLAP_9DOFRAW_MICROS
+// FILTERED_9DOF
 //
-// Example for using a 9 degrees-of-freedom sensor within an LLAP protocol
+// Example for using a 9 degrees-of-freedom sensor with a filtered estimate of angle
+// from the gyro rates. 
+//
 // NOTE: If you need more flash memory for code, eliminate the LLAP interface
 // and just set up a set of constants to drive the loop as desired (default).
 //
@@ -55,6 +57,7 @@
 // memory unless the values are actually used in the code below. Mileage depends on quality of linker
 // and rather than tempt fate we just revert to old habits.
 // ----------------------------------------------------------------------------------------------------
+
 
 
 #include <Wire.h>
@@ -181,6 +184,7 @@ void processMessage(void)
     else if (msg.startsWith("INTVL"))
     {
       long intvl = msg.substring(5).toInt();
+
       if (intvl > 0)
       {
         count = 0;
@@ -203,6 +207,15 @@ void processMessage(void)
           default:
             break;
         } // end switch on interval scale
+        cycleTime_us = cycleTime_ms * 1000;
+
+        // Align the scheduled time to the interval boundary
+        // There is no compelling reason other than to make the
+        // display increment with as little remainder as possible
+        // This just makes it easier to see the chosen rate by
+        // seeing which digit is changing. A little extra time
+        // to compute for a little easier debug information.
+        schedTime_us = schedTime_us - (schedTime_us % cycleTime_us) + cycleTime_us;
       } // end if interval is positive
     } // end if recognized command
     else
@@ -294,7 +307,13 @@ void processSchedule(void)
       Serial.println(",");
     
       // Schedule next
-      schedTime_us += cycleTime_us;
+      // Align the scheduled time to the interval boundary
+      // There is no compelling reason other than to make the
+      // display increment with as little remainder as possible
+      // This just makes it easier to see the chosen rate by
+      // seeing which digit is changing. A little extra time
+      // to compute for a little easier debug information.
+      schedTime_us = schedTime_us - (schedTime_us % cycleTime_us) + cycleTime_us;
     }
   }
 }
@@ -306,6 +325,7 @@ void loop()
   processSchedule();
 
 }
+
 
 
 
