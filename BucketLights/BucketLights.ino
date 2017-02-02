@@ -6,6 +6,7 @@
 const uint16_t PIN  = 6;
 const uint16_t PIXELS = 16;
 const uint16_t MAX_BRIGHTNESS = 32; //  1/8 max brightness, (mostly) eye safe
+const uint16_t MIN_BRIGHTNESS = 2;
 //const uint16_t MAX_BRIGHTNESS = 255; //  100% brightness, NOT eye safe (AND VERY WARM)
 
 // Parameter 1 = number of pixels in strip
@@ -51,16 +52,15 @@ Adafruit_NeoPixel myStrips[] =
 void setup()
 {
   myStrips[0].begin();
-  myStrips[0].setBrightness(MAX_BRIGHTNESS);
+  myStrips[0].setBrightness(MIN_BRIGHTNESS);
   fill(myStrips[0], BLACK); // Initialize all pixels to 'off'
 }
 
 void loop()
 {
-fill(myStrips[0], ORANGE);
-  delay(500);
-fill(myStrips[0], BLACK);
-  delay(500);
+  flash(myStrips[0], ORANGE, 10, 300);
+  flash(myStrips[0], GREEN, 10, 300);
+  flash(myStrips[0], RED, 10, 300);
 }
 
 

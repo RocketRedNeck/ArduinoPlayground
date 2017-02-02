@@ -62,10 +62,6 @@
 #include <Adafruit_LSM9DS0.h>
 #include <Adafruit_Sensor.h>  // not used in this demo but required!
 
-#include <LLAPSerial.h>       // include the library from https://github.com/CisecoPlc/LLAPSerial 
-                              // place in Arduino\Library path
-                              // Useful to build up a device control/status pattern 
-
 #include "MicroTimer.h"       // Keep track of one or more markable times 
 
 char deviceId[] = "--";
@@ -116,7 +112,7 @@ void setupSensor()
 
 // Default this application to start transmitting at 100 Hz as soon as it
 // starts
-bool cycle = false;
+bool cycle = true;
 unsigned long count = 0;
 unsigned long cycleTime_ms = 10;
 unsigned long long cycleTime_us = cycleTime_ms * 1000;
@@ -131,90 +127,16 @@ void setup()
   // initialise serial:
   Serial.begin(250000); // Hardware serial
 
-  // Initialise the LLAPSerial library and set our default ID to -- (unknown)
-  LLAP.init(deviceId);
-
   // Try to initialise and warn if we couldn't detect the chip
   if (!lsm.begin())
   {
-    // Error #0001 is our first error; it indicates that the LSM sensor is not wired correctly
-    LLAP.sendMessage(String("ERROR0001"));
     while (1);
-  }
-  else
-  {
-     LLAP.sendMessage(String("STARTED"));
   }
 }
 
 String msg;
 String reply;
 
-void processMessage(void)
-{
-  // process the LLAP command when a newline arrives:
-  if (LLAP.bMsgReceived) 
-  {
-    msg = LLAP.sMessage;
-    reply = msg;
-    LLAP.bMsgReceived = false;  // if we do not clear the message flag then message processing will be blocked
-
-    // HELLO and CHDEVID are handled by the LLAP message processing automatically
-    // and do NOT respond with the device ID
-    if (msg.compareTo("ACK------") == 0)
-    {
-      LLAP.sendMessage(reply);
-    }
-    else if (msg.compareTo("DEVNAME--") == 0)
-    {
-      reply = "ARDUINO--";
-      LLAP.sendMessage(reply);
-    }
-    else if (msg.compareTo("CYCLE----") == 0)
-    {
-      cycle = true;
-    }
-    else if (msg.compareTo("STOP-----") == 0)
-    {
-      cycle = false;
-    }
-    else if (msg.startsWith("INTVL"))
-    {
-      long intvl = msg.substring(5).toInt();
-      if (intvl > 0)
-      {
-        count = 0;
-        switch (msg.substring(8).c_str()[0])
-        {
-          case 'T':
-            cycleTime_ms = intvl;
-            break;
-          case 'S':
-            cycleTime_ms = (intvl * 1000);
-            break;
-          case 'M':
-            cycleTime_ms = (intvl * 60000);
-            break;
-          case 'H':
-            cycleTime_ms = (intvl * 36000000);
-          case 'D':
-            cycleTime_ms = (intvl * 86400000);
-            break;
-          default:
-            break;
-        } // end switch on interval scale
-      } // end if interval is positive
-    } // end if recognized command
-    else
-    {
-      // Define a generic error message for unknown
-      // commands; the offending message is sent back
-      reply = "ERROR----";
-      LLAP.sendMessage(reply);
-      LLAP.sendMessage(msg);
-    }
-  }   // end if message received by LLAP (hardware serial)
-} // end processMessage
 
 void processSchedule(void)
 {
@@ -238,60 +160,29 @@ void processSchedule(void)
     {
       long long beforeRead_us = timer.read();
       
-      lsm.read();
+      lsm.readGyro();
 
       long long afterRead_us = timer.read();
 
       // Build a NMEA-like message for this sensor data
-      // We prefix the message with 'n' to distinquish
-      // it from the LLAP messages (which are too short
-      // to create an efficient stream); the truth is
-      // that even an NMEA steam is heavy on the bus
-      // requiring transmission of up to 7 bytes for
-      // values that only require 2 bytes. Further, the
-      // Serial.print(...) functions, while convenient
-      // put a large burden on the available processing
-      // capacity when formatting is involved. Future
-      // designs should consider a more direct transfer
-      // of bytes with formatting performed by processors
-      // with greater capacity (this will leave more
-      // of the arduino environment for filters that
-      // depend on latency knowledge to produce accurate
-      // answers).
-      //
       // For now we send the data formatted to the serial
       // stream to make it somewhat human readable.
       //
       // In our design we will include measures of time
       // to estimate latency of read and print operations
       //
-      Serial.print("nPPLSM,");
+      Serial.print("$PPLSM,");
       timer.print(aboutNow_us);
       Serial.print(",");
       timer.print(beforeRead_us);
       Serial.print(",");
-      timer.print(afterRead_us);
-      Serial.print(",");
-      Serial.print(lsm.accelData.x,0);
-      Serial.print(",");
-      Serial.print(lsm.accelData.y,0);
-      Serial.print(",");
-      Serial.print(lsm.accelData.z,0);
+      timer.println(afterRead_us);
       Serial.print(",");
       Serial.print(lsm.gyroData.x,0);
       Serial.print(",");
       Serial.print(lsm.gyroData.y,0);
       Serial.print(",");
-      Serial.print(lsm.gyroData.z,0);
-      Serial.print(",");
-      Serial.print(lsm.magData.x,0);
-      Serial.print(",");
-      Serial.print(lsm.magData.y,0);
-      Serial.print(",");
-      Serial.print(lsm.magData.z,0);
-      Serial.print(",");
-      timer.print();
-      Serial.println(",");
+      Serial.println(lsm.gyroData.z,0);
     
       // Schedule next
       schedTime_us += cycleTime_us;
@@ -301,8 +192,6 @@ void processSchedule(void)
 
 void loop() 
 {
-  processMessage();
-
   processSchedule();
 
 }
