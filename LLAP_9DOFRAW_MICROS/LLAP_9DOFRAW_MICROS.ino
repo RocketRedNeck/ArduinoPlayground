@@ -90,7 +90,7 @@ Adafruit_LSM9DS0 lsm = Adafruit_LSM9DS0();
 
 
 float aLsb = 2.0 / 32768.0;
-float gLsb = 245.0 / 32768.0;
+float gLsb = 2000.0 / 32768.0;
 float mLsb = 2.0 / 32768.0;
 
 void setupSensor()
@@ -109,9 +109,9 @@ void setupSensor()
   //lsm.setupMag(lsm.LSM9DS0_MAGGAIN_12GAUSS);
 
   // 3.) Setup the gyroscope
-  lsm.setupGyro(lsm.LSM9DS0_GYROSCALE_245DPS);
+  //lsm.setupGyro(lsm.LSM9DS0_GYROSCALE_245DPS);
   //lsm.setupGyro(lsm.LSM9DS0_GYROSCALE_500DPS);
-  //lsm.setupGyro(lsm.LSM9DS0_GYROSCALE_2000DPS);
+  lsm.setupGyro(lsm.LSM9DS0_GYROSCALE_2000DPS);
 }
 
 // Default this application to start transmitting at 100 Hz as soon as it

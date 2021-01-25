@@ -164,10 +164,10 @@ void setup()
   // make sure communication was successful.
   uint32_t status = dof.begin();
  
-  Serial.print("LSM9DS0 WHO_AM_I's returned: 0x");
-  Serial.println(status, HEX);
-  Serial.println("Should be 0x49D4");
-  Serial.println();
+//  Serial.print("LSM9DS0 WHO_AM_I's returned: 0x");
+//  Serial.println(status, HEX);
+//  Serial.println("Should be 0x49D4");
+//  Serial.println();
   
  // Set data output ranges; choose lowest ranges for maximum resolution
  // Accelerometer scale can be: A_SCALE_2G, A_SCALE_4G, A_SCALE_6G, A_SCALE_8G, or A_SCALE_16G   
@@ -292,13 +292,13 @@ void loop()
     roll  *= 180.0f / PI;
 
     int tick = (((tickCount++) % 20 == 0)? 1 : 0);
-    Serial.print(tick);
-    Serial.print(" ");
-    Serial.print(yaw, 2);
-    Serial.print(" ");
-    Serial.print(pitch, 2);
-    Serial.print(" ");
-    Serial.println(roll, 2);
+//    Serial.print(tick);
+//    Serial.print(" ");
+//    Serial.print(yaw, 2);
+//    Serial.print(" ");
+//    Serial.print(pitch, 2);
+//    Serial.print(" ");
+//    Serial.println(roll, 2);
     
 //    Serial.print("ax = "); Serial.print((int)1000*ax);  
 //    Serial.print(" ay = "); Serial.print((int)1000*ay); 
@@ -392,10 +392,10 @@ void printOrientation(float x, float y, float z)
   pitch *= 180.0 / PI;
   roll *= 180.0 / PI;
   
-  Serial.print("Pitch, Roll: ");
-  Serial.print(pitch, 2);
-  Serial.print(", ");
-  Serial.println(roll, 2);
+//  Serial.print("Pitch, Roll: ");
+//  Serial.print(pitch, 2);
+//  Serial.print(", ");
+//  Serial.println(roll, 2);
 }
 
 
