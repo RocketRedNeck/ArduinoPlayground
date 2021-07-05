@@ -1,12 +1,16 @@
 {
 	"folders": [
-		{
-			"path": "RadioTime"
-		},
-		{
-			"name": "Dummy",
-			"path": "Dummy"
-		}
-	],
+        {
+            "path": "RadioTime"
+        },
+        {
+            "name": "Dummy",
+            "path": "Dummy"
+        },
+        {
+            "name": "ShiftReg",
+            "path": "ShiftReg"
+        }
+    ],
     "settings": {}
 }

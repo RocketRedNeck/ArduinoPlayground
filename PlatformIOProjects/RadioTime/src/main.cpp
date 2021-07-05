@@ -498,8 +498,12 @@ void decodeTime(void)
             // The time at the last sample is just completed.
             // To the nearest second we are at the end of the minute
             // that has just been reported
-            rtc.adjust(DateTime(year, month, day, hours, minutes, 59));
+            rtc.adjust(DateTime(year, month, day, hours, minutes+1, 0));
             ++timeAdjusted_count;
+            if (timeAdjusted_count == 100)
+            {
+                timeAdjusted_count = 0;
+            }
         }
     }
     else
