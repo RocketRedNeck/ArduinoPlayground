@@ -56,7 +56,7 @@ void setup()
 
 void loop()
 {
-    for (long i = 0; i < 10000; i++)
+    for (long i = 0; i < 1000000; i++)
     {
         // Convert to BCD
         long input = i;
@@ -68,6 +68,6 @@ void loop()
             input /= 10;
         }        
         updateShiftRegister(bcd >> 16, (bcd >> 8) & 0xFF, bcd & 0xFF);
-        delay(100);
+        delay(1000);
     }
 }
