@@ -110,7 +110,9 @@ void updateShiftRegister(byte msw, byte mid, byte lsw)
 void setup()
 {
     // initialize GDB stub
-    debug_init();
+    //debug_init();
+
+    Serial.begin(115200);
 
 
     pinMode(DP_BUILT_IN_LED,    OUTPUT);
@@ -560,29 +562,38 @@ void updateDisplay(void)
         if (rtcPresent && rtc.isrunning())
         {
             DateTime now = rtc.now();
-            year = now.year();
-            month = now.month();
-            day = now.day();
-            hours = now.hour();
-            minutes = now.minute();
-            seconds = now.second();
+            int yr = now.year();
+            int mon = now.month();
+            int dy = now.day();
+            int hr = now.hour();
+            int min = now.minute();
+            int sec = now.second();
+
+            nextDisplay_ms += 1000;
+
+            // Convert time to BCD
+            long x = hr;
+            x = 100*x + min;
+            x = 100*x + sec;
+
+            //Display date every minute for 10 seconds
+            if (sec < 10)
+            {
+                x = yr;
+                x = 100*x + mon;
+                x = 100*x + dy;
+            }
+
+            long bcd = 0;
+            int shift = 0;
+            while (x > 0) 
+            {
+                bcd |= (x % 10) << (shift++ << 2);
+                x /= 10;
+            }
+            Serial.println(bcd,HEX);
+            updateShiftRegister(bcd >> 16, (bcd >> 8) & 0xFF, bcd & 0xFF);
         }
-
-        nextDisplay_ms += 1000;
-
-        // Convert time to BCD
-        long x = hours;
-        x = 10*x + minutes;
-        x = 10*x + seconds;
-
-        long bcd = 0;
-        int shift = 0;
-        while (x > 0) 
-        {
-            bcd |= (x % 10) << (shift++ << 2);
-            x /= 10;
-        }        
-        updateShiftRegister(bcd >> 16, (bcd >> 8) & 0xFF, bcd & 0xFF);
     }
 }
 
