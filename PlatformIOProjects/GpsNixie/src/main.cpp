@@ -177,8 +177,8 @@ void updateDisplay(void)
         int dy = GPS.day;
         int hr = GPS.hour;
         int min = GPS.minute;
-        int sec = GPS.seconds;  // We will actually be slightly behind, but ok
-
+        int sec = GPS.seconds + 1;  // the message is old, plus serial latency
+        sec = sec % 60;
         hr -= 7; // Tucson offset
         if (hr < 0)
         {
@@ -215,6 +215,7 @@ void updateDisplay(void)
 }
 
 uint32_t gpstimer = millis();
+uint32_t charcount = 0;
 bool handleGps(void)
 {
     char c = GPS.read();
@@ -251,7 +252,7 @@ bool handleGps(void)
         Serial.print(GPS.seconds, DEC); Serial.print('.');
         if (GPS.milliseconds < 10) {
         Serial.print("00");
-        } else if (GPS.milliseconds > 9 && GPS.milliseconds < 100) {
+        } else if (GPS.milliseconds < 100) {
         Serial.print("0");
         }
         Serial.println(GPS.milliseconds);
