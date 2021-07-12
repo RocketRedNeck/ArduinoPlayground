@@ -30,12 +30,7 @@
 #include <time.h>
 
 #include <Adafruit_GPS.h>
-#include <SoftwareSerial.h>
-
-// Connect the GPS Power pin to 5V
-// Connect the GPS Ground pin to ground
-// Connect the GPS TX (transmit) pin to Digital 8
-// Connect the GPS RX (receive) pin to Digital 9
+#include <SoftwareSerial.h> // See pin enum below
 
 // ----------------------------------------------------------------------------------------------------
 // Some constants are herein #defined or enumerated rather than instantiated as const to avoid using
@@ -183,7 +178,7 @@ void updateDisplay(void)
         int hr = GPS.hour;
         int min = GPS.minute;
         int sec = GPS.seconds;  // We will actually be slightly behind, but ok
-        
+
         hr -= 7; // Tucson offset
         if (hr < 0)
         {
